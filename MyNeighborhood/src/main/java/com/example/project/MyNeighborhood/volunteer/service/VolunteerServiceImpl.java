@@ -1,5 +1,6 @@
 package com.example.project.MyNeighborhood.volunteer.service;
 
+import com.example.project.MyNeighborhood.exception.AlreadyFulfilledTheRequestException;
 import com.example.project.MyNeighborhood.exception.EnoughVolunteersException;
 import com.example.project.MyNeighborhood.exception.RequestNotFoundException;
 import com.example.project.MyNeighborhood.exception.UserDoesNotExistException;
@@ -33,6 +34,7 @@ public class VolunteerServiceImpl implements VolunteerService {
     @Override
     public void createVolunteer(final String userId, final UUID requestId) {
         assertRequestHasNotEnoughVolunteer(requestId);
+        assertUserHasNotAlreadyFulfilledTheRequest(userId, requestId);
         final User requester = getUser(userId);
         final Request request = getRequest(requestId);
         final Volunteer volunteer = Volunteer.builder()
@@ -54,6 +56,12 @@ public class VolunteerServiceImpl implements VolunteerService {
         final int volunteersNumber = volunteerRepository.countVolunteersForRequest(requestId);
         if (volunteersNumber >= 5) {
             throw new EnoughVolunteersException();
+        }
+    }
+
+    private void assertUserHasNotAlreadyFulfilledTheRequest(final String userId, final UUID requestId) {
+        if (volunteerRepository.findVolunteerByUserIdAndRequestId(userId, requestId).isPresent()) {
+            throw new AlreadyFulfilledTheRequestException();
         }
     }
 }

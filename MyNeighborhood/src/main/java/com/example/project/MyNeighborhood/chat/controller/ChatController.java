@@ -1,7 +1,7 @@
 package com.example.project.MyNeighborhood.chat.controller;
 
 import com.example.project.MyNeighborhood.chat.model.ChatMessage;
-import com.example.project.MyNeighborhood.chat.model.LatestMessage;
+import com.example.project.MyNeighborhood.chat.model.LatestFlow;
 import com.example.project.MyNeighborhood.chat.repository.ChatMessageRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,8 +37,12 @@ public class ChatController {
     }
 
     @GetMapping(path = "/api/v1/chat/latest")
-    public ResponseEntity<List<LatestMessage>> getLatestChatMessagesForSender(@RequestHeader(name = "userId") final UUID userId) {
-        return ResponseEntity.ok(chatMessageRepository.findLatestChatMessagesForSender(userId));
+    public ResponseEntity<List<ChatMessage>> getLatestChatMessagesForSender(@RequestHeader(name = "userId") final UUID userId) {
+        List<ChatMessage> results = new ArrayList<>();
+        for (LatestFlow latestFlow : chatMessageRepository.findLatestFlowsForUser(userId)) {
+            results.add(chatMessageRepository.findLatestChatMessages(latestFlow.getFlow(), latestFlow.getLatestDate()));
+        }
+        return ResponseEntity.ok(results);
     }
 
     @MessageMapping("/chat")

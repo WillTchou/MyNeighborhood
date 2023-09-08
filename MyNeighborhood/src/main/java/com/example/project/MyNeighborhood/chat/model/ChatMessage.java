@@ -33,4 +33,6 @@ public class ChatMessage {
     private LocalDateTime date = LocalDateTime.now();
     @Column(name = "messageType", nullable = false)
     private MessageType messageType;
+    @Column(name = "flow", nullable = false)
+    private String flow;
 }

@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
-    @ExceptionHandler({UserStateException.class, RequestStateException.class,
-            EmailAlreadyExistsException.class})
+    @ExceptionHandler({UserStateException.class, RequestStateException.class, EmailAlreadyExistsException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     ResponseEntity<ExceptionResponse> handleException(MyNeighborhoodStateException exception) {
         ExceptionResponse response = ExceptionResponse.builder()
@@ -40,7 +39,7 @@ public class ApiExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({EnoughVolunteersException.class})
+    @ExceptionHandler({EnoughVolunteersException.class, AlreadyFulfilledTheRequestException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     ResponseEntity<ExceptionResponse> handleException(EnoughVolunteersException exception) {
         ExceptionResponse response = ExceptionResponse.builder()
