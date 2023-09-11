@@ -42,9 +42,10 @@ public class RequestServiceImpl implements RequestService {
                 .map(requestDTOMapper)
                 .collect(Collectors.toList());
     }
+
     @Override
-    public List<RequestDTO> getAllUnfulfilledRequests() {
-        return requestRepository.findAllUnfulfilledRequests()
+    public List<RequestDTO> getAllUnfulfilledRequests(final String userId) {
+        return requestRepository.findAllUnfulfilledRequests(convertStringToUUID(userId))
                 .stream()
                 .map(requestDTOMapper)
                 .collect(Collectors.toList());
@@ -73,9 +74,20 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     @Transactional
-    public void updateRequest(final String userId,final UUID requestId, final Request updatedRequest) {
+    public void updateRequestWithUser(final String userId, final String requestId, final Request updatedRequest) {
+        final UUID requestUuid = convertStringToUUID(requestId);
+        assertRequestExist(requestUuid);
+        getRequestByIdForUser(userId, requestUuid).ifPresent(requestToUpdate -> {
+            setRequestField(requestToUpdate, updatedRequest);
+            requestRepository.save(requestToUpdate);
+        });
+    }
+
+    @Override
+    @Transactional
+    public void updateRequest(final UUID requestId, final Request updatedRequest) {
         assertRequestExist(requestId);
-        getRequestByIdForUser(userId, requestId).ifPresent(requestToUpdate -> {
+        requestRepository.findById(requestId).ifPresent(requestToUpdate -> {
             setRequestField(requestToUpdate, updatedRequest);
             requestRepository.save(requestToUpdate);
         });

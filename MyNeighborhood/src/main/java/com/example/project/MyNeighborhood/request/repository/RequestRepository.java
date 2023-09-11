@@ -12,11 +12,11 @@ import java.util.UUID;
 
 @Repository
 public interface RequestRepository extends JpaRepository<Request, UUID> {
-    @Query("SELECT r FROM Request r WHERE r.requester.id = :userId")
+    @Query("SELECT r FROM Request r WHERE r.requester.id = :userId ORDER BY r.creationDate DESC")
     List<Request> findAllRequestsForUser(@Param("userId") final UUID userId);
 
-    @Query("SELECT r FROM Request r WHERE r.status = Unfulfilled")
-    List<Request> findAllUnfulfilledRequests();
+    @Query("SELECT r FROM Request r WHERE r.status = Unfulfilled AND r.requester.id <> :userId")
+    List<Request> findAllUnfulfilledRequests(@Param("userId") final UUID userId);
 
     @Query("SELECT r FROM Request r WHERE r.requester.id = :userId AND r.id = :requestId")
     Optional<Request> findRequestByIdForUser(@Param("userId") final UUID userId,

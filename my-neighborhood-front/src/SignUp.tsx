@@ -28,6 +28,8 @@ export const SignUp = () => {
   };
 
   const [user, setUser] = useState<RegisterRequest>(initialValue);
+  const [error, setError] = useState('');
+  const [errorGov, setErrorGov] = useState('');
   const [governmentIdentity, setGovernmentIdentity] = useState<File>();
 
   const isValid =
@@ -75,8 +77,16 @@ export const SignUp = () => {
 
   const onSubmit = (e: SubmitEvent) => {
     e.preventDefault();
-    authRequestRegister(user, (res) =>
-      handleThenRegister(res.data.token, res.data.userId)
+    authRequestRegister(
+      user,
+      (res) => handleThenRegister(res.data.token, res.data.userId),
+      (err) => {
+        console.log(err);
+        setError(err.message);
+        setTimeout(() => {
+          setError('');
+        }, 6000);
+      }
     );
   };
 
@@ -85,7 +95,13 @@ export const SignUp = () => {
     data.append('document', governmentIdentity);
     axios
       .post('http://localhost:8080/api/v1/governmentIdentity', data)
-      .then((res) => setUser({ ...user, governmentIdentityId: res.data }));
+      .then((res) => setUser({ ...user, governmentIdentityId: res.data }))
+      .catch((err) => {
+        setErrorGov(err.message);
+        setTimeout(() => {
+          setError('');
+        }, 6000);
+      });
   };
 
   return (
@@ -132,13 +148,15 @@ export const SignUp = () => {
               setFile={setGovernmentIdentity}
               accept="image/*"
               onChange={sendGovernmentIdentity}
+              error={errorGov}
+              setError={setErrorGov}
             />
           </Stack>
         </Stack>
         <Stack
           className={classes.submitButtonStack}
           spacing={2}
-          direction="row"
+          direction="column"
           justifyContent="center"
         >
           <ButtonClick
@@ -151,6 +169,19 @@ export const SignUp = () => {
           >
             Sumbit
           </ButtonClick>
+          {error && (
+            <>
+              {error === 'Request failed with status code 400' ? (
+                <div className={classes.errorConnection}>
+                  Email is not valid
+                </div>
+              ) : (
+                <div className={classes.errorConnection}>
+                  Sorry your request contains errors
+                </div>
+              )}
+            </>
+          )}
         </Stack>
       </Paper>
     </div>
@@ -175,5 +206,10 @@ const useStyles = makeStyles({
   },
   submitButtonStack: {
     marginTop: '12px'
+  },
+  errorConnection: {
+    backgroundColor: 'red',
+    padding: '9px',
+    borderRadius: '8px'
   }
 });

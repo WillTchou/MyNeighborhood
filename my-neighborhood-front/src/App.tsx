@@ -5,6 +5,7 @@ import { SignIn } from './SignIn';
 import { CreateRequest } from './CreateRequest';
 import { Home } from './Home';
 import { Chatbox } from './Chatbox';
+import { MyRequests } from './MyRequests';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/create-request" element={<CreateRequest />} />
         <Route path="/" element={<Home />} />
         <Route path="/chatbox" element={<Chatbox />} />
+        <Route path="/my-requests" element={<MyRequests />} />
       </Routes>
     </BrowserRouter>
   );

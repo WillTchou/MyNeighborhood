@@ -15,7 +15,6 @@ import { authService } from './authService';
 import { ButtonClick } from './ButtonClick';
 import Stack from '@mui/material/Stack';
 import MenuList from '@mui/material/MenuList';
-import Paper from '@mui/material/Paper';
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -40,6 +39,10 @@ export const Header = () => {
 
   const redirectCreateRequestsPage = () => {
     navigate('/create-request');
+  };
+
+  const redirectMyRequestsPage = () => {
+    navigate('/my-requests');
   };
 
   const redirectHomePage = () => {
@@ -240,7 +243,7 @@ export const Header = () => {
               >
                 <MenuItem onClick={handleCloseUserMenu}>
                   <Typography
-                    onClick={redirectCreateRequestsPage}
+                    onClick={redirectMyRequestsPage}
                     textAlign="center"
                   >
                     My Requests

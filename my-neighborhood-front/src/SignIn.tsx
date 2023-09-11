@@ -20,6 +20,7 @@ export const SignIn = () => {
   };
 
   const [auth, setAuth] = useState<AuthRequest>(initialValue);
+  const [error, setError] = useState('');
 
   const isValid = !!auth.email && !!auth.password;
 
@@ -52,7 +53,12 @@ export const SignIn = () => {
     authRequestLogin(
       auth,
       (res) => handleThenRegister(res.data.token, res.data.userId),
-      (err) => console.log(err)
+      (err) => {
+        setError(err.message);
+        setTimeout(() => {
+          setError('');
+        }, 6000);
+      }
     );
   };
 
@@ -107,6 +113,11 @@ export const SignIn = () => {
             >
               Sign up
             </ButtonClick>
+            {error === 'Request failed with status code 403' && (
+              <div className={classes.errorConnection}>
+                Sorry incorrect email or password. Please try again
+              </div>
+            )}
           </Stack>
         </Stack>
       </Paper>
@@ -132,5 +143,10 @@ const useStyles = makeStyles({
   },
   submitButtonStack: {
     marginTop: '12px'
+  },
+  errorConnection: {
+    backgroundColor: 'red',
+    padding: '9px',
+    borderRadius: '8px'
   }
 });

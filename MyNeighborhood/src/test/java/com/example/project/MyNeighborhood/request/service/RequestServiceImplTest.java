@@ -126,7 +126,7 @@ class RequestServiceImplTest {
         //When
         Mockito.when(requestRepository.existsById(REQUEST_ID)).thenReturn(true);
         Mockito.when(requestRepository.findRequestByIdForUser(USER_ID, REQUEST_ID)).thenReturn(Optional.of(REQUEST));
-        requestServiceImpl.updateRequest(USER_ID.toString(), REQUEST_ID, newRequest);
+        requestServiceImpl.updateRequestWithUser(USER_ID.toString(), REQUEST_ID.toString(), newRequest);
         //Then
         Assertions.assertThat(REQUEST.getFulfilledDate()).isNull();
         assertionsRequestUpdate(newRequest);
@@ -140,7 +140,7 @@ class RequestServiceImplTest {
         //When
         Mockito.when(requestRepository.existsById(REQUEST_ID)).thenReturn(true);
         Mockito.when(requestRepository.findRequestByIdForUser(USER_ID, REQUEST_ID)).thenReturn(Optional.of(REQUEST));
-        requestServiceImpl.updateRequest(USER_ID.toString(), REQUEST_ID, newRequest);
+        requestServiceImpl.updateRequestWithUser(USER_ID.toString(), REQUEST_ID.toString(), newRequest);
         //Then
         Assertions.assertThat(REQUEST.getFulfilledDate()).isNotNull();
         assertionsRequestUpdate(newRequest);
@@ -152,7 +152,8 @@ class RequestServiceImplTest {
         final Request newRequest = getNewRequest();
         //When
         Mockito.when(requestRepository.existsById(REQUEST_ID)).thenReturn(false);
-        Assertions.assertThatThrownBy(() -> requestServiceImpl.updateRequest(USER_ID.toString(), REQUEST_ID, newRequest))
+        Assertions.assertThatThrownBy(() -> requestServiceImpl.updateRequestWithUser(USER_ID.toString(),
+                        REQUEST_ID.toString(), newRequest))
                 .isInstanceOf(RequestNotFoundException.class);
         //Then
         Mockito.verify(requestRepository, Mockito.only()).existsById(REQUEST_ID);
@@ -167,7 +168,7 @@ class RequestServiceImplTest {
         //When
         Mockito.when(requestRepository.existsById(REQUEST_ID)).thenReturn(true);
         Mockito.when(requestRepository.findRequestByIdForUser(USER_ID, REQUEST_ID)).thenReturn(Optional.empty());
-        requestServiceImpl.updateRequest(USER_ID.toString(), REQUEST_ID, newRequest);
+        requestServiceImpl.updateRequestWithUser(USER_ID.toString(), REQUEST_ID.toString(), newRequest);
         //Then
         Mockito.verify(requestRepository, Mockito.times(1)).existsById(REQUEST_ID);
         Mockito.verify(requestRepository, Mockito.times(1)).findRequestByIdForUser(USER_ID, REQUEST_ID);

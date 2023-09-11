@@ -4,19 +4,24 @@ import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { Stack } from '@mui/material';
+import ErrorIcon from '@mui/icons-material/Error';
 
 type InputFileProps = {
   file: File;
   setFile: Dispatch<SetStateAction<File>>;
   accept: string;
   onChange: (file: File) => void;
+  error: any;
+  setError: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export const InputFile = ({
   accept,
   file,
   setFile,
-  onChange
+  onChange,
+  error,
+  setError
 }: InputFileProps) => {
   const classes = useStyles();
   const [fileName, setFileName] = useState('No selected file');
@@ -24,6 +29,7 @@ export const InputFile = ({
   const handleDelete = () => {
     setFileName('No selected file');
     setFile(null);
+    setError('');
   };
 
   return (
@@ -31,7 +37,9 @@ export const InputFile = ({
       <form
         action=""
         style={
-          file ? { backgroundColor: '#23DC3D' } : { backgroundColor: '#93E1D8' }
+          file && !error
+            ? { backgroundColor: '#23DC3D' }
+            : { backgroundColor: '#93E1D8' }
         }
         className={classes.inputFile}
         onClick={() => {
@@ -55,10 +63,19 @@ export const InputFile = ({
           }}
         />
         {file ? (
-          <Stack direction="column" alignItems="center" gap={1}>
-            <CloudDoneIcon sx={{ fontSize: 60 }} />
-            <span>{fileName}</span>
-          </Stack>
+          <>
+            {error ? (
+              <Stack direction="column" alignItems="center" gap={1}>
+                <ErrorIcon sx={{ fontSize: 60 }} />
+                <span>Too long file</span>
+              </Stack>
+            ) : (
+              <Stack direction="column" alignItems="center" gap={1}>
+                <CloudDoneIcon sx={{ fontSize: 60 }} />
+                <span>{fileName}</span>
+              </Stack>
+            )}
+          </>
         ) : (
           <Stack direction="column" alignItems="center" gap={1}>
             <CloudUpload sx={{ fontSize: 60 }} />

@@ -1,5 +1,8 @@
 package com.example.project.MyNeighborhood.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,6 +17,15 @@ public class ApiExceptionHandler {
     ResponseEntity<ExceptionResponse> handleException(MyNeighborhoodStateException exception) {
         ExceptionResponse response = ExceptionResponse.builder()
                 .code(exception.getCode())
+                .message(exception.getMessage())
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({ConstraintViolationException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    ResponseEntity<ExceptionResponse> handleException(ValidationException exception) {
+        ExceptionResponse response = ExceptionResponse.builder()
                 .message(exception.getMessage())
                 .build();
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -39,11 +51,30 @@ public class ApiExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({EnoughVolunteersException.class, AlreadyFulfilledTheRequestException.class})
+    @ExceptionHandler({EnoughVolunteersException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     ResponseEntity<ExceptionResponse> handleException(EnoughVolunteersException exception) {
         ExceptionResponse response = ExceptionResponse.builder()
                 .code(exception.getCode())
+                .message(exception.getMessage())
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler({AlreadyFulfilledTheRequestException.class})
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    ResponseEntity<ExceptionResponse> handleException(AlreadyFulfilledTheRequestException exception) {
+        ExceptionResponse response = ExceptionResponse.builder()
+                .code(exception.getCode())
+                .message(exception.getMessage())
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler({ExpiredJwtException.class})
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    ResponseEntity<ExceptionResponse> handleException(ExpiredJwtException exception) {
+        ExceptionResponse response = ExceptionResponse.builder()
                 .message(exception.getMessage())
                 .build();
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);

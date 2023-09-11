@@ -106,11 +106,11 @@ class RequestControllerTest {
         final Request request = new Request(requestId, Type.OneTimeTask, Status.Unfulfilled, 2.4F, -0.9F,
                 "new description", LocalDateTime.now(), LocalDateTime.now(), buildUser(), null);
         // When
-        final ResponseEntity<Void> result = requestController.updateRequest(USER_ID_STRING, requestId, request);
+        final ResponseEntity<Void> result = requestController.updateRequest(USER_ID_STRING, requestId.toString(), request);
         //Then
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        Mockito.verify(requestService, Mockito.only()).updateRequest(USER_ID_STRING, requestId, request);
+        Mockito.verify(requestService, Mockito.only()).updateRequestWithUser(USER_ID_STRING, requestId.toString(), request);
     }
 
     private static User buildUser() {

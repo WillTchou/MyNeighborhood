@@ -5,13 +5,17 @@ import com.example.project.MyNeighborhood.exception.EnoughVolunteersException;
 import com.example.project.MyNeighborhood.exception.RequestNotFoundException;
 import com.example.project.MyNeighborhood.exception.UserDoesNotExistException;
 import com.example.project.MyNeighborhood.request.model.Request;
+import com.example.project.MyNeighborhood.request.model.Status;
 import com.example.project.MyNeighborhood.request.repository.RequestRepository;
+import com.example.project.MyNeighborhood.request.service.RequestService;
 import com.example.project.MyNeighborhood.user.model.User;
 import com.example.project.MyNeighborhood.user.repository.UserRepository;
 import com.example.project.MyNeighborhood.volunteer.model.Volunteer;
 import com.example.project.MyNeighborhood.volunteer.repository.VolunteerRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static com.example.project.MyNeighborhood.HelperUtils.StringUtils.convertStringToUUID;
@@ -22,18 +26,20 @@ public class VolunteerServiceImpl implements VolunteerService {
     private final UserRepository userRepository;
     private final RequestRepository requestRepository;
     private final VolunteerRepository volunteerRepository;
+    private final RequestService requestService;
 
     public VolunteerServiceImpl(final UserRepository userRepository,
                                 final RequestRepository requestRepository,
-                                final VolunteerRepository volunteerRepository) {
+                                final VolunteerRepository volunteerRepository,
+                                final RequestService requestService) {
         this.userRepository = userRepository;
         this.requestRepository = requestRepository;
         this.volunteerRepository = volunteerRepository;
+        this.requestService = requestService;
     }
 
     @Override
     public void createVolunteer(final String userId, final UUID requestId) {
-        assertRequestHasNotEnoughVolunteer(requestId);
         assertUserHasNotAlreadyFulfilledTheRequest(userId, requestId);
         final User requester = getUser(userId);
         final Request request = getRequest(requestId);
@@ -42,6 +48,21 @@ public class VolunteerServiceImpl implements VolunteerService {
                 .request(request)
                 .build();
         volunteerRepository.save(volunteer);
+        updateRequestWhenVolunteerLimitationIsReached(requestId, request);
+    }
+
+    @Override
+    public List<Volunteer> getAllVolunteersByRequest(final UUID requestId){
+        return volunteerRepository.findAllVolunteersByRequest(requestId);
+    }
+
+    private void updateRequestWhenVolunteerLimitationIsReached(final UUID requestId,final Request request) {
+        if (volunteerRepository.countVolunteersForRequest(requestId) == 5) {
+            final Request fulfilledRequest = new Request(requestId, request.getType(), Status.Fulfilled,
+                    request.getLatitude(), request.getLongitude(), request.getDescription(), request.getCreationDate(),
+                    LocalDateTime.now(), request.getRequester(), request.getVolunteers());
+            requestService.updateRequest(request.getId(), fulfilledRequest);
+        }
     }
 
     private Request getRequest(final UUID requestId) {
@@ -52,15 +73,8 @@ public class VolunteerServiceImpl implements VolunteerService {
         return userRepository.findById(convertStringToUUID(userId)).orElseThrow(UserDoesNotExistException::new);
     }
 
-    private void assertRequestHasNotEnoughVolunteer(final UUID requestId) {
-        final int volunteersNumber = volunteerRepository.countVolunteersForRequest(requestId);
-        if (volunteersNumber >= 5) {
-            throw new EnoughVolunteersException();
-        }
-    }
-
     private void assertUserHasNotAlreadyFulfilledTheRequest(final String userId, final UUID requestId) {
-        if (volunteerRepository.findVolunteerByUserIdAndRequestId(userId, requestId).isPresent()) {
+        if (volunteerRepository.findVolunteerByUserIdAndRequestId(convertStringToUUID(userId), requestId).isPresent()) {
             throw new AlreadyFulfilledTheRequestException();
         }
     }

@@ -20,6 +20,7 @@ import { chatMessageService } from './chatMessageService';
 import { userService } from './userService';
 import { currentUserId, headers } from './apiModels';
 import { Message } from './Message';
+import setBodyColor from './setBody';
 
 const drawerWidth = 240;
 var stompClient = null;
@@ -84,6 +85,7 @@ const Drawer = styled(MuiDrawer, {
 export const Chatbox = () => {
   const classes = useStyles();
   useRedirectToSignInPage();
+  setBodyColor({ color: '#DDFFF7' });
 
   const [open, setOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);

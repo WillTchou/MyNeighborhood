@@ -41,7 +41,6 @@ export const Map = () => {
       .then((res) => res.data)
       .then((result) => {
         setUnfulfilledNumber(result);
-        console.log(result);
       });
   };
 
@@ -138,7 +137,7 @@ const useStyles = makeStyles({
     position: 'absolute',
     margin: '10vh 50vw 0',
     backgroundColor: 'white',
-    padding: '23px',
+    padding: '18px',
     borderRadius: '8px'
   }
 });

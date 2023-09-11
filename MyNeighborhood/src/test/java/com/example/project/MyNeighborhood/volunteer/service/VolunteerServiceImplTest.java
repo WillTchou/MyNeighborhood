@@ -7,6 +7,7 @@ import com.example.project.MyNeighborhood.request.model.Request;
 import com.example.project.MyNeighborhood.request.model.Status;
 import com.example.project.MyNeighborhood.request.model.Type;
 import com.example.project.MyNeighborhood.request.repository.RequestRepository;
+import com.example.project.MyNeighborhood.request.service.RequestService;
 import com.example.project.MyNeighborhood.user.model.Role;
 import com.example.project.MyNeighborhood.user.model.User;
 import com.example.project.MyNeighborhood.user.repository.UserRepository;
@@ -34,6 +35,8 @@ class VolunteerServiceImplTest {
     private UserRepository userRepository;
     @Mock
     private VolunteerRepository volunteerRepository;
+    @Mock
+    private RequestService requestService;
     private VolunteerServiceImpl volunteerServiceImpl;
 
     @BeforeEach
@@ -41,7 +44,8 @@ class VolunteerServiceImplTest {
         Assertions.assertThat(requestRepository).isNotNull();
         Assertions.assertThat(userRepository).isNotNull();
         Assertions.assertThat(volunteerRepository).isNotNull();
-        volunteerServiceImpl = new VolunteerServiceImpl(userRepository, requestRepository, volunteerRepository);
+        Assertions.assertThat(requestService).isNotNull();
+        volunteerServiceImpl = new VolunteerServiceImpl(userRepository, requestRepository, volunteerRepository, requestService);
     }
 
     @Test

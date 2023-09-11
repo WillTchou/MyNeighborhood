@@ -8,11 +8,11 @@ import com.example.project.MyNeighborhood.request.model.Request;
 import com.example.project.MyNeighborhood.volunteer.model.Volunteer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,7 +41,7 @@ public class User implements UserDetails {
     @NotBlank
     private String lastname;
     @Column(name = "email", length = 250, nullable = false, unique = true)
-    @Email
+    @Email(message = "Email is not valid", regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
     @NotBlank
     private String email;
     @Column(name = "address", length = 250, nullable = false)
@@ -71,6 +71,18 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<ChatMessage> chatMessagesReceived;
+
+    public User(final String firstname, final String lastname, final String email, final String address,
+                final Role role, final String password, final GovernmentIdentity governmentIdentity) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.email = email;
+        this.address = address;
+        this.role = role;
+        this.password = password;
+        this.governmentIdentity = governmentIdentity;
+        validateState();
+    }
 
     public User(final UUID id, final String firstname, final String lastname, final String email, final String address,
                 final Role role, final String password, final GovernmentIdentity governmentIdentity, final ProfilePicture profilePicture,

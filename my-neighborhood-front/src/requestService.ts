@@ -13,6 +13,10 @@ let getRequestsNumber = () => {
   return Axios.get('requests/number');
 };
 
+let getRequestsByUserId = () => {
+  return Axios.get('requests/list');
+};
+
 let getRequestById = (id) => {
   return Axios.get(`requests/${id}`);
 };
@@ -21,8 +25,8 @@ let deleteRequestById = (id) => {
   return Axios.delete(`requests/${id}`);
 };
 
-let updateRequestById = (id, request) => {
-  return Axios.put(`requests/${id}`, request);
+let updateRequestById = (requestId, request) => {
+  return Axios.put(`requests/${requestId}`, request);
 };
 
 export const requestService = {
@@ -31,5 +35,6 @@ export const requestService = {
   getRequestById,
   deleteRequestById,
   updateRequestById,
-  getRequestsNumber
+  getRequestsNumber,
+  getRequestsByUserId
 };

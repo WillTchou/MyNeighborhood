@@ -39,10 +39,12 @@ public class Request {
     private String description;
     @Column(name = "creation_date", nullable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonIgnore
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime creationDate = LocalDateTime.now();
     @Column(name = "fulfilled_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonIgnore
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime fulfilledDate;
     @ManyToOne

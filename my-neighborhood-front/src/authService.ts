@@ -1,3 +1,4 @@
+import jwtDecode, { JwtPayload } from 'jwt-decode';
 import Axios from './callerService';
 import { AuthRequest, RegisterRequest } from './models';
 
@@ -21,6 +22,14 @@ let logout = () => {
 
 let isLogged = () => {
   let token = localStorage.getItem('token');
+  if(!token){
+    return false
+  }
+  const decoded:JwtPayload = jwtDecode(token)
+  const expirationTime = (decoded.exp * 1000) - 60000
+  if(expirationTime <= Date.now()){
+    logout()
+  }
   return !!token;
 };
 

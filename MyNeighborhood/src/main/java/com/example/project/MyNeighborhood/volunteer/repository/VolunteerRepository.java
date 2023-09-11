@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,7 +15,10 @@ public interface VolunteerRepository extends JpaRepository<Volunteer, Long> {
     @Query("SELECT COUNT(DISTINCT v.user.id) FROM Volunteer v WHERE v.request.id = :requestId")
     int countVolunteersForRequest(@Param("requestId") final UUID requestId);
 
-    @Query("SELECT Volunteer v FROM Volunteer v WHERE v.user.id = :userId AND v.request.id = :requestId")
-    Optional<Volunteer> findVolunteerByUserIdAndRequestId(@Param("userId") final String userId,
+    @Query("SELECT v FROM Volunteer v WHERE v.user.id = :userId AND v.request.id = :requestId")
+    Optional<Volunteer> findVolunteerByUserIdAndRequestId(@Param("userId") final UUID userId,
                                                           @Param("requestId") final UUID requestId);
+
+    @Query("SELECT v FROM Volunteer v WHERE v.request.id = :requestId")
+    List<Volunteer> findAllVolunteersByRequest(@Param("requestId") final UUID requestId);
 }

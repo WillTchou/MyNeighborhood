@@ -38,6 +38,8 @@ export type RequestGet = {
   description: string;
   status: Status;
   requester: User;
+  creationDate?:Date;
+  fulfilledDate?:Date;
 };
 
 export type ChatMessagePost = {
@@ -45,7 +47,7 @@ export type ChatMessagePost = {
   recipient: User;
   content: string;
   messageType: MessageType;
-  flow:string
+  flow: string;
 };
 
 export type ChatMessageGet = {
@@ -55,7 +57,7 @@ export type ChatMessageGet = {
   content: string;
   date: Date;
   messageType: MessageType;
-  flow?:string;
+  flow?: string;
 };
 
 export enum TypeEnum {

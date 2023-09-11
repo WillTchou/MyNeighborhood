@@ -27,8 +27,8 @@ public class RequestController {
     }
 
     @GetMapping
-    public ResponseEntity<List<RequestDTO>> getAllUnfulfilledRequests() {
-        return ResponseEntity.ok(requestService.getAllUnfulfilledRequests());
+    public ResponseEntity<List<RequestDTO>> getAllUnfulfilledRequests(@RequestHeader(name = "userId") final String userId) {
+        return ResponseEntity.ok(requestService.getAllUnfulfilledRequests(userId));
     }
 
     @GetMapping(path = "/number")
@@ -42,18 +42,18 @@ public class RequestController {
         return ResponseEntity.ok(requestService.createRequest(userId, requestForm));
     }
 
-    @DeleteMapping(path = "/{id}")
+    @DeleteMapping(path = "/{requestId}")
     public ResponseEntity<Void> deleteRequest(@RequestHeader(name = "userId") final String userId,
                                               @PathVariable("requestId") final UUID requestId) {
         requestService.deleteRequestById(userId, requestId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping(path = "/{id}")
+    @PutMapping(path = "/{requestId}")
     public ResponseEntity<Void> updateRequest(@RequestHeader(name = "userId") final String userId,
-                                              @PathVariable("requestId") final UUID requestId,
+                                              @PathVariable("requestId") final String requestId,
                                               @RequestBody @NotNull final Request request) {
-        requestService.updateRequest(userId, requestId, request);
+        requestService.updateRequestWithUser(userId, requestId, request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -49,15 +49,11 @@ public class AuthenticationService {
     private User buildUserWithRegisterRequest(final RegisterRequest registerRequest) {
         final String registerRequestPassword = registerRequest.getPassword();
         final GovernmentIdentity governmentIdentity = getGovernmentIdentity(registerRequest);
-        return User.builder()
-                .firstname(registerRequest.getFirstname())
-                .lastname(registerRequest.getLastname())
-                .email(registerRequest.getEmail())
-                .address(registerRequest.getAddress())
-                .password(passwordEncoder.encode(registerRequestPassword))
-                .role(Role.USER)
-                .governmentIdentity(governmentIdentity)
-                .build();
+        return new User(registerRequest.getFirstname(), registerRequest.getLastname(), registerRequest.getEmail(),
+                registerRequest.getAddress(),
+                Role.USER,
+                passwordEncoder.encode(registerRequestPassword),
+                governmentIdentity);
     }
 
     private GovernmentIdentity getGovernmentIdentity(RegisterRequest registerRequest) {

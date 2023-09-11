@@ -9,9 +9,10 @@ import java.util.UUID;
 
 public interface RequestService {
     List<RequestDTO> getAllRequestsForUser(String userId);
-    List<RequestDTO> getAllUnfulfilledRequests();
+    List<RequestDTO> getAllUnfulfilledRequests(String userId);
     int getUnfulfilledRequestsNumber();
     UUID createRequest(String userId, RequestForm requestForm);
     void deleteRequestById(String userId, UUID requestId);
-    void updateRequest(String userId, UUID requestId, Request updatedRequest);
+    void updateRequest(UUID requestId, Request updatedRequest);
+    void updateRequestWithUser(String userId, String requestId, Request updatedRequest);
 }
