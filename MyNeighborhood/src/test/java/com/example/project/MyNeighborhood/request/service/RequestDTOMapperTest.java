@@ -35,8 +35,9 @@ class RequestDTOMapperTest {
         final float longitude = 2f;
         final String description = "description";
         final LocalDateTime now = LocalDateTime.now();
-        final Request request = new Request(id, oneTimeTask, fulfilled, latitude, longitude,
-                description, now, now, user, null);
+        final String address = "address";
+        final Request request = new Request(id, oneTimeTask, fulfilled, latitude, longitude, address,
+                description, now, now, true, user, null);
         //When
         final RequestDTO result = requestDTOMapper.apply(request);
         //Then
@@ -47,6 +48,7 @@ class RequestDTOMapperTest {
         Assertions.assertThat(result.description()).isEqualTo(request.getDescription());
         Assertions.assertThat(result.latitude()).isEqualTo(request.getLatitude());
         Assertions.assertThat(result.longitude()).isEqualTo(request.getLongitude());
+        Assertions.assertThat(result.address()).isEqualTo(request.getAddress());
         Assertions.assertThat(result.creationDate()).isEqualTo(request.getCreationDate());
         Assertions.assertThat(result.fulfilledDate()).isEqualTo(request.getFulfilledDate());
         Assertions.assertThat(result.requester()).isEqualTo(request.getRequester());

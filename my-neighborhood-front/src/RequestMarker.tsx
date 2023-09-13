@@ -5,10 +5,9 @@ import { useState } from 'react';
 
 type RequestMarkerProps = {
   request: RequestGet;
-  onSend: (event: any, request: RequestGet, message: string) => void;
 };
 
-export const RequestMarker = ({ request, onSend }: RequestMarkerProps) => {
+export const RequestMarker = ({ request }: RequestMarkerProps) => {
   const [openDrawer, setOpenDrawer] = useState(false);
 
   const toggleDrawer = () => {
@@ -30,12 +29,7 @@ export const RequestMarker = ({ request, onSend }: RequestMarkerProps) => {
             : 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png'
         }
       />
-      <RequestDrawer
-        open={openDrawer}
-        onClose={onClose}
-        request={request}
-        onSend={onSend}
-      />
+      <RequestDrawer open={openDrawer} onClose={onClose} request={request} />
     </div>
   );
 };

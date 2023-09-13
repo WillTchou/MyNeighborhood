@@ -1,30 +1,114 @@
 import { Avatar, Box, Drawer, Stack } from '@mui/material';
 import { Label } from './Label';
 import { ButtonClick } from './ButtonClick';
-import { RequestGet, Status, TypeEnum } from './models';
+import {
+  ChatMessagePost,
+  MessageType,
+  RequestGet,
+  Status,
+  TypeEnum,
+  User
+} from './models';
 import makeStyles from '@mui/styles/makeStyles/makeStyles';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FulFillRequestPopin } from './FulFillRequestPopin';
+import { over } from 'stompjs';
+import SockJS from 'sockjs-client';
+import { currentUserId, headers } from './apiModels';
+import { volunteerService } from './volunteerService';
+import { useNavigate } from 'react-router-dom';
+import { userService } from './userService';
+
+let initialValue = {
+  id: '',
+  firstname: '',
+  lastname: '',
+  email: '',
+  password: '',
+  address: '',
+  governmentIdentityId: '',
+  profilePictureId: ''
+};
+var stompClient = null;
 
 type RequestDrawerProps = {
   open: boolean;
   onClose: () => void;
   request: RequestGet;
-  onSend: (event: any, request: RequestGet, message: string) => void;
 };
 
 export const RequestDrawer = ({
   open,
   onClose,
-  request,
-  onSend
+  request
 }: RequestDrawerProps) => {
   const [openPopin, setOpenPopin] = useState(false);
+  const [user, setUser] = useState<User>(initialValue);
+  const [error, setError] = useState('');
 
   const classes = useStyles();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    userService
+      .getUserById(currentUserId)
+      .then((res) => res.data)
+      .then((result) => setUser(result));
+  }, []);
+
+  const configureSocket = async () => {
+    let Sock = new SockJS('http://localhost:8080/ws');
+    stompClient = over(Sock);
+    stompClient.connect({}, () =>
+      stompClient.subscribe('/user/' + currentUserId + '/private', {})
+    );
+  };
 
   const handleClickOpen = () => {
+    configureSocket();
     setOpenPopin(true);
+  };
+
+  const redirectChatboxPage = () => {
+    navigate('/chatbox');
+  };
+
+  const helpRequest = (requestId: string) => {
+    volunteerService
+      .createVolunteer(requestId)
+      .then(() => redirectChatboxPage())
+      .catch((err) => {
+        setError(err.response.data.code);
+        setTimeout(() => {
+          setError('');
+        }, 4000);
+      });
+  };
+
+  const sendPrivateValue = async (
+    event,
+    request: RequestGet,
+    message: string
+  ) => {
+    event.preventDefault();
+    if (stompClient) {
+      helpRequest(request.id);
+      var chatMessage: ChatMessagePost = {
+        sender: user,
+        recipient: request.requester,
+        content: message,
+        messageType: MessageType.CHAT,
+        flow:
+          user.id < request.requester.id
+            ? user.id + '/' + request.requester.id
+            : request.requester.id + '/' + user.id
+      };
+      stompClient.send(
+        '/myNeighborhood/private-message',
+        headers,
+        JSON.stringify(chatMessage)
+      );
+    }
   };
 
   return (
@@ -60,6 +144,7 @@ export const RequestDrawer = ({
           <Label children={TypeEnum[request.type]} />
           <Label children={Status[request.status]} />
         </Stack>
+        <span className={classes.address}>{request.address}</span>
         <p className={classes.description}>{request.description}</p>
         <div className={classes.fulfill}>
           <ButtonClick
@@ -77,7 +162,8 @@ export const RequestDrawer = ({
               open={openPopin}
               setOpen={setOpenPopin}
               request={request}
-              onSend={onSend}
+              onSend={sendPrivateValue}
+              error={error}
             />
           )}
         </div>
@@ -90,6 +176,12 @@ const useStyles = makeStyles({
   paper: {
     width: 300,
     zIndex: '80 !important'
+  },
+  address: {
+    display: 'flex',
+    justifyContent: 'center',
+    fontWeight: 'bold',
+    color: '#FFA69E'
   },
   description: {
     width: '85%',

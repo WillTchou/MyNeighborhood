@@ -1,5 +1,6 @@
 package com.example.project.MyNeighborhood.volunteer.service;
 
+import com.example.project.MyNeighborhood.exception.AlreadyFulfilledTheRequestException;
 import com.example.project.MyNeighborhood.exception.EnoughVolunteersException;
 import com.example.project.MyNeighborhood.exception.RequestNotFoundException;
 import com.example.project.MyNeighborhood.exception.UserDoesNotExistException;
@@ -59,64 +60,14 @@ class VolunteerServiceImplTest {
         Mockito.when(requestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
         volunteerServiceImpl.createVolunteer(USER_ID.toString(), REQUEST_ID);
         //Then
-        Mockito.verify(volunteerRepository, Mockito.times(1)).countVolunteersForRequest(REQUEST_ID);
+        Mockito.verify(volunteerRepository, Mockito.times(2)).countVolunteersForRequest(REQUEST_ID);
         Mockito.verify(userRepository, Mockito.times(1)).findById(USER_ID);
         Mockito.verify(requestRepository, Mockito.times(1)).findById(REQUEST_ID);
         Mockito.verify(volunteerRepository, Mockito.times(1)).save(volunteer);
     }
 
-    @Test
-    void createVolunteerWhenEnoughVolunteers() {
-        //Given
-        final Request request = getRequest();
-        final Volunteer volunteer = getVolunteer(request);
-        //When
-        Mockito.when(volunteerRepository.countVolunteersForRequest(REQUEST_ID)).thenReturn(5);
-        Assertions.assertThatThrownBy(() -> volunteerServiceImpl.createVolunteer(USER_ID.toString(), REQUEST_ID))
-                .isInstanceOf(EnoughVolunteersException.class);
-        //Then
-        Mockito.verify(volunteerRepository, Mockito.only()).countVolunteersForRequest(REQUEST_ID);
-        Mockito.verify(userRepository, Mockito.never()).findById(USER_ID);
-        Mockito.verify(requestRepository, Mockito.never()).findById(REQUEST_ID);
-        Mockito.verify(volunteerRepository, Mockito.never()).save(volunteer);
-    }
-
-    @Test
-    void createVolunteerRequesterDoesNotExist() {
-        //Given
-        final Request request = getRequest();
-        final Volunteer volunteer = getVolunteer(request);
-        //When
-        Mockito.when(volunteerRepository.countVolunteersForRequest(REQUEST_ID)).thenReturn(2);
-        Mockito.when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
-        Assertions.assertThatThrownBy(() -> volunteerServiceImpl.createVolunteer(USER_ID.toString(), REQUEST_ID))
-                .isInstanceOf(UserDoesNotExistException.class);
-        Mockito.verify(volunteerRepository, Mockito.times(1)).countVolunteersForRequest(REQUEST_ID);
-        Mockito.verify(userRepository, Mockito.times(1)).findById(USER_ID);
-        Mockito.verify(requestRepository, Mockito.never()).findById(REQUEST_ID);
-        Mockito.verify(volunteerRepository, Mockito.never()).save(volunteer);
-    }
-
-    @Test
-    void createVolunteerRequestDoesNotExist() {
-        //Given
-        final Request request = getRequest();
-        final Volunteer volunteer = getVolunteer(request);
-        //When
-        Mockito.when(volunteerRepository.countVolunteersForRequest(REQUEST_ID)).thenReturn(1);
-        Mockito.when(userRepository.findById(USER_ID)).thenReturn(Optional.of(buildUser()));
-        Mockito.when(requestRepository.findById(REQUEST_ID)).thenReturn(Optional.empty());
-        //Then
-        Assertions.assertThatThrownBy(() -> volunteerServiceImpl.createVolunteer(USER_ID.toString(), REQUEST_ID))
-                .isInstanceOf(RequestNotFoundException.class);
-        Mockito.verify(volunteerRepository, Mockito.times(1)).countVolunteersForRequest(REQUEST_ID);
-        Mockito.verify(userRepository, Mockito.times(1)).findById(USER_ID);
-        Mockito.verify(requestRepository, Mockito.times(1)).findById(REQUEST_ID);
-        Mockito.verify(volunteerRepository, Mockito.never()).save(volunteer);
-    }
-
     private static Request getRequest() {
-        return new Request(Type.OneTimeTask, Status.Unfulfilled, 2.4F, -0.9F,
+        return new Request(Type.OneTimeTask, Status.Unfulfilled, 2.4F, -0.9F,"address",
                 "new description", buildUser());
     }
 

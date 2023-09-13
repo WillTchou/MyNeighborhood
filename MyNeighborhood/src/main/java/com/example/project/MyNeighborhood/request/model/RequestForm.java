@@ -11,5 +11,6 @@ public class RequestForm {
     Type type;
     Float latitude;
     Float longitude;
+    String address;
     String description;
 }

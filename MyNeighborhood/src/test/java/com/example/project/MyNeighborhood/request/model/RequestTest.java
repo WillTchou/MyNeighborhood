@@ -55,11 +55,13 @@ class RequestTest {
     }
 
     private static void getRequest(final String description) {
-        new Request(UUID, Type.MaterialNeed, -1F, 1F, description, getUser(), null);
+        new Request(UUID, Type.MaterialNeed, -1F, 1F,"address", description,
+                getUser(), null);
     }
 
     private static void getRequest(final Type type, final Float latitude, final Float longitude) {
-        new Request(UUID, type, latitude, longitude, "description", getUser(), null);
+        new Request(UUID, type, latitude, longitude, "address","description",
+                getUser(), null);
     }
 
     private static User getUser() {

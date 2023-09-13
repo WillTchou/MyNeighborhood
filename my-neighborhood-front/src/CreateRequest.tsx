@@ -17,11 +17,9 @@ import { ButtonClick } from './ButtonClick';
 import { useNavigate } from 'react-router-dom';
 import { useLoadScript } from '@react-google-maps/api';
 import { useRedirectToSignInPage } from './useRedirectToSignInPage';
-import PlacesAutocomplete, {
-  geocodeByAddress,
-  getLatLng
-} from 'react-places-autocomplete';
+import { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 import { requestService } from './requestService';
+import { GooglePlacesAutocomplete } from './GooglePlacesAutocomplete';
 
 export const CreateRequest = () => {
   const classes = useStyles();
@@ -32,6 +30,7 @@ export const CreateRequest = () => {
     type: 'MaterialNeed' as Type,
     latitude: null,
     longitude: null,
+    address: '',
     description: ''
   };
 
@@ -48,7 +47,10 @@ export const CreateRequest = () => {
   if (!isLoaded) return <div>Loading...</div>;
 
   const isValid =
-    !!request.description && !!request.latitude && !!request.longitude;
+    !!request.description &&
+    !!request.latitude &&
+    !!request.longitude &&
+    !!request.address;
 
   const handleTypeChange = (event: SelectChangeEvent) => {
     setRequest({ ...request, type: event.target.value as Type });
@@ -76,7 +78,12 @@ export const CreateRequest = () => {
       .then((results) => getLatLng(results[0]))
       .then(({ lat, lng }) => {
         setLocation(address);
-        setRequest({ ...request, latitude: lat, longitude: lng });
+        setRequest({
+          ...request,
+          latitude: lat,
+          longitude: lng,
+          address: address
+        });
       })
       .catch((error) => console.error('Error', error));
   };
@@ -109,48 +116,11 @@ export const CreateRequest = () => {
               <MenuItem value={'OneTimeTask'}>{TypeEnum.OneTimeTask}</MenuItem>
             </Select>
           </FormControl>
-          <PlacesAutocomplete
-            value={location}
-            onChange={onLocationChange}
-            onSelect={handleSelect}
-          >
-            {({
-              getInputProps,
-              suggestions,
-              getSuggestionItemProps,
-              loading
-            }) => (
-              <div>
-                <input
-                  {...getInputProps({
-                    placeholder: 'Search Places ...',
-                    className: 'location-search-input'
-                  })}
-                />
-                <div className="autocomplete-dropdown-container">
-                  {loading && <div>Loading...</div>}
-                  {suggestions.map((suggestion) => {
-                    const className = suggestion.active
-                      ? 'suggestion-item--active'
-                      : 'suggestion-item';
-                    const style = suggestion.active
-                      ? { backgroundColor: '#fafafa', cursor: 'pointer' }
-                      : { backgroundColor: '#ffffff', cursor: 'pointer' };
-                    return (
-                      <div
-                        {...getSuggestionItemProps(suggestion, {
-                          className,
-                          style
-                        })}
-                      >
-                        <span>{suggestion.description}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </PlacesAutocomplete>
+          <GooglePlacesAutocomplete
+            location={location}
+            onLocationChange={onLocationChange}
+            handleSelect={handleSelect}
+          />
           <TextInput
             label="Description"
             onChange={handleDescriptionChange}

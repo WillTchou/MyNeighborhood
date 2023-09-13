@@ -9,22 +9,27 @@ import { TextInput } from './TextInput';
 import { RequestGet } from './models';
 import { ButtonClick } from './ButtonClick';
 import { Dispatch, SetStateAction, useState } from 'react';
+import makeStyles from '@mui/styles/makeStyles';
 
 type FulFillRequestPopinProps = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   request: RequestGet;
   onSend: (event: any, request: RequestGet, message: string) => void;
+  error: string;
 };
 
 export const FulFillRequestPopin = ({
   open,
   setOpen,
   request,
-  onSend
+  onSend,
+  error
 }: FulFillRequestPopinProps) => {
   const [message, setMessage] = useState('');
   const [openMessage, setOpenMessage] = useState(true);
+
+  const classes = useStyles();
 
   const handleMessage = (event) => {
     event.preventDefault();
@@ -63,6 +68,11 @@ export const FulFillRequestPopin = ({
           variant="filled"
           fullwidth={true}
         />
+        {error === 'has.already.fulfilled.request' && (
+          <div className={classes.errorMessage}>
+            You've already fulfilled the request
+          </div>
+        )}
       </DialogContent>
       <DialogActions>
         {openMessage ? (
@@ -89,3 +99,11 @@ export const FulFillRequestPopin = ({
     </Dialog>
   );
 };
+
+const useStyles = makeStyles({
+  errorMessage: {
+    backgroundColor: 'red',
+    padding: '9px',
+    borderRadius: '8px'
+  }
+});

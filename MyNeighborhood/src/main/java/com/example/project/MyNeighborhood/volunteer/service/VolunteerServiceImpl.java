@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.example.project.MyNeighborhood.HelperUtils.StringUtils.convertStringToUUID;
@@ -41,6 +42,7 @@ public class VolunteerServiceImpl implements VolunteerService {
     @Override
     public void createVolunteer(final String userId, final UUID requestId) {
         assertUserHasNotAlreadyFulfilledTheRequest(userId, requestId);
+        assertRequestHasNotEnoughVolunteers(requestId);
         final User requester = getUser(userId);
         final Request request = getRequest(requestId);
         final Volunteer volunteer = Volunteer.builder()
@@ -52,15 +54,16 @@ public class VolunteerServiceImpl implements VolunteerService {
     }
 
     @Override
-    public List<Volunteer> getAllVolunteersByRequest(final UUID requestId){
+    public List<Volunteer> getAllVolunteersByRequest(final UUID requestId) {
         return volunteerRepository.findAllVolunteersByRequest(requestId);
     }
 
-    private void updateRequestWhenVolunteerLimitationIsReached(final UUID requestId,final Request request) {
+    private void updateRequestWhenVolunteerLimitationIsReached(final UUID requestId, final Request request) {
         if (volunteerRepository.countVolunteersForRequest(requestId) == 5) {
             final Request fulfilledRequest = new Request(requestId, request.getType(), Status.Fulfilled,
-                    request.getLatitude(), request.getLongitude(), request.getDescription(), request.getCreationDate(),
-                    LocalDateTime.now(), request.getRequester(), request.getVolunteers());
+                    request.getLatitude(), request.getLongitude(), request.getAddress(), request.getDescription(),
+                    request.getCreationDate(), LocalDateTime.now(), false, request.getRequester(),
+                    request.getVolunteers());
             requestService.updateRequest(request.getId(), fulfilledRequest);
         }
     }
@@ -74,8 +77,17 @@ public class VolunteerServiceImpl implements VolunteerService {
     }
 
     private void assertUserHasNotAlreadyFulfilledTheRequest(final String userId, final UUID requestId) {
-        if (volunteerRepository.findVolunteerByUserIdAndRequestId(convertStringToUUID(userId), requestId).isPresent()) {
+        final Optional<Volunteer> optionalVolunteer = volunteerRepository.findVolunteerByUserIdAndRequestId(
+                convertStringToUUID(userId),
+                requestId);
+        if (optionalVolunteer.isPresent()) {
             throw new AlreadyFulfilledTheRequestException();
+        }
+    }
+
+    private void assertRequestHasNotEnoughVolunteers(final UUID requestId) {
+        if (volunteerRepository.countVolunteersForRequest(requestId) >= 5) {
+            throw new EnoughVolunteersException();
         }
     }
 }

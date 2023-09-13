@@ -27,6 +27,7 @@ export type RequestPost = {
   type: Type;
   latitude: number;
   longitude: number;
+  address: string;
   description: string;
 };
 
@@ -35,11 +36,13 @@ export type RequestGet = {
   type: Type;
   latitude: number;
   longitude: number;
+  address: string;
   description: string;
   status: Status;
+  displayed:boolean;
   requester: User;
-  creationDate?:Date;
-  fulfilledDate?:Date;
+  creationDate?:string;
+  fulfilledDate?:string;
 };
 
 export type ChatMessagePost = {

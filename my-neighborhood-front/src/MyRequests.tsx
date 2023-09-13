@@ -10,20 +10,12 @@ import setBodyColor from './setBody';
 import dateFormat from 'dateformat';
 import { RepublishRequest } from './RepublishRequest';
 
-let now = new Date();
-
 export const MyRequests = () => {
   const classes = useStyles();
   useRedirectToSignInPage();
   setBodyColor({ color: '#DDFFF7' });
 
   const [requests, setRequests] = useState<RequestGet[]>([]);
-
-  const timeskip = (date: Date) => {
-    const copy = new Date(date);
-    copy.setDate(copy.getDate() + 1);
-    return copy;
-  };
 
   useEffect(() => {
     requestService
@@ -52,10 +44,8 @@ export const MyRequests = () => {
                   <Label children={Status[request.status]} />
                 </Stack>
                 <p className={classes.description}>{request.description}</p>
-                {request.status === Status.Fulfilled &&
-                  timeskip(request.fulfilledDate) < now && (
-                    <RepublishRequest request={request} />
-                  )}
+                {request.status === Status.Unfulfilled &&
+                  !request.displayed && <RepublishRequest request={request} />}
               </Stack>
             </div>
           ))}

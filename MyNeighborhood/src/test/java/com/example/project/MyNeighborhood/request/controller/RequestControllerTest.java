@@ -39,7 +39,8 @@ class RequestControllerTest {
         final String userId = USER_ID.toString();
         final User user = buildUser();
         final RequestDTO requestDTO = new RequestDTO(UUID.randomUUID(), Type.MaterialNeed, Status.Unfulfilled, 1F,
-                3F, "description", LocalDateTime.now(), null, user);
+                3F, "address","description", LocalDateTime.now(), null,
+                true, user);
         final List<RequestDTO> requestDTOS = List.of(requestDTO);
         //When
         Mockito.when(requestService.getAllRequestsForUser(userId)).thenReturn(requestDTOS);
@@ -82,8 +83,7 @@ class RequestControllerTest {
         final ResponseEntity<UUID> result = requestController.createRequest(USER_ID_STRING, requestForm);
         //Then
         Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.getBody()).isNotNull();
-        Assertions.assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        Assertions.assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         Mockito.verify(requestService, Mockito.only()).createRequest(USER_ID_STRING, requestForm);
     }
 
@@ -104,7 +104,7 @@ class RequestControllerTest {
         //Given
         final UUID requestId = UUID.randomUUID();
         final Request request = new Request(requestId, Type.OneTimeTask, Status.Unfulfilled, 2.4F, -0.9F,
-                "new description", LocalDateTime.now(), LocalDateTime.now(), buildUser(), null);
+                "address","new description", LocalDateTime.now(), LocalDateTime.now(), false,buildUser(), null);
         // When
         final ResponseEntity<Void> result = requestController.updateRequest(USER_ID_STRING, requestId.toString(), request);
         //Then

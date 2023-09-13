@@ -34,6 +34,8 @@ public class Request {
     private Float latitude;
     @Column(name = "longitude", nullable = false)
     private Float longitude;
+    @Column(name = "address", nullable = false)
+    private String address;
     @Column(name = "description", length = 300, nullable = false)
     @NotBlank(message = "Description is mandatory")
     private String description;
@@ -47,6 +49,8 @@ public class Request {
     @JsonIgnore
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime fulfilledDate;
+    @Column(name = "displayed", nullable = false)
+    private boolean displayed = true;
     @ManyToOne
     @JoinColumn(name = "requester_id", nullable = false)
     private User requester;
@@ -54,12 +58,13 @@ public class Request {
     @JsonIgnore
     private Set<Volunteer> volunteers;
 
-    public Request(final UUID id, final Type type, final Float latitude, final Float longitude,
+    public Request(final UUID id, final Type type, final Float latitude, final Float longitude, final String address,
                    final String description, final User requester, final Set<Volunteer> volunteers) {
         this.id = id;
         this.type = type;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.address = address;
         this.description = description;
         this.requester = requester;
         this.volunteers = volunteers;
@@ -68,11 +73,12 @@ public class Request {
     }
 
     public Request(final Type type, final Status status, final Float latitude, final Float longitude,
-                   final String description, final User requester) {
+                   final String address, final String description, final User requester) {
         this.type = type;
         this.status = status;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.address = address;
         this.description = description;
         this.requester = requester;
         this.volunteers = null;
@@ -80,11 +86,12 @@ public class Request {
         validateState();
     }
 
-    public Request(final Type type, final Float latitude, final Float longitude,
+    public Request(final Type type, final Float latitude, final Float longitude, final String address,
                    final String description, final User requester) {
         this.type = type;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.address = address;
         this.description = description;
         this.requester = requester;
         this.volunteers = null;

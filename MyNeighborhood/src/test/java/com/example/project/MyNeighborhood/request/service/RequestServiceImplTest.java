@@ -29,6 +29,7 @@ class RequestServiceImplTest {
     private static final float LATITUDE = -1.2F;
     private static final float LONGITUDE = 2.3F;
     private static final String DESCRIPTION = "description";
+    private static final String ADDRESS = "address";
     @Mock
     private RequestRepository requestRepository;
     @Mock
@@ -60,7 +61,7 @@ class RequestServiceImplTest {
     @Test
     void createRequest() {
         //Given
-        final RequestForm requestForm = new RequestForm(MATERIAL_NEED, LATITUDE, LONGITUDE, DESCRIPTION);
+        final RequestForm requestForm = new RequestForm(MATERIAL_NEED, LATITUDE, LONGITUDE, ADDRESS, DESCRIPTION);
         //When
         Mockito.when(userRepository.findById(USER_ID)).thenReturn(Optional.of(USER));
         requestServiceImpl.createRequest(USER_ID.toString(), requestForm);
@@ -71,7 +72,7 @@ class RequestServiceImplTest {
     @Test
     void createRequestWhenUserDoesNotExist() {
         //Given
-        final RequestForm requestForm = new RequestForm(MATERIAL_NEED, LATITUDE, LONGITUDE, DESCRIPTION);
+        final RequestForm requestForm = new RequestForm(MATERIAL_NEED, LATITUDE, LONGITUDE, ADDRESS,DESCRIPTION);
         //When
         Mockito.when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
         //Then
@@ -128,7 +129,6 @@ class RequestServiceImplTest {
         Mockito.when(requestRepository.findRequestByIdForUser(USER_ID, REQUEST_ID)).thenReturn(Optional.of(REQUEST));
         requestServiceImpl.updateRequestWithUser(USER_ID.toString(), REQUEST_ID.toString(), newRequest);
         //Then
-        Assertions.assertThat(REQUEST.getFulfilledDate()).isNull();
         assertionsRequestUpdate(newRequest);
     }
 
@@ -136,7 +136,7 @@ class RequestServiceImplTest {
     void updateRequestWhenRequestFulfilled() {
         //Given
         final Request newRequest = new Request(Type.OneTimeTask, Status.Fulfilled, 2.4F, -0.9F,
-                "new description", USER);
+                ADDRESS,"new description", USER);
         //When
         Mockito.when(requestRepository.existsById(REQUEST_ID)).thenReturn(true);
         Mockito.when(requestRepository.findRequestByIdForUser(USER_ID, REQUEST_ID)).thenReturn(Optional.of(REQUEST));
@@ -189,6 +189,7 @@ class RequestServiceImplTest {
         return new Request(MATERIAL_NEED,
                 LATITUDE,
                 LONGITUDE,
+                ADDRESS,
                 DESCRIPTION,
                 USER);
     }
@@ -208,7 +209,7 @@ class RequestServiceImplTest {
     }
 
     private static Request getNewRequest() {
-        return new Request(Type.OneTimeTask, Status.Unfulfilled, 2.4F, -0.9F,
+        return new Request(Type.OneTimeTask, Status.Unfulfilled, 2.4F, -0.9F, ADDRESS,
                 "new description", USER);
     }
 

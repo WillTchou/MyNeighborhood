@@ -62,7 +62,14 @@ export const SignIn = () => {
     );
   };
 
+  const onKeyDown = (event) => {
+    if (event.keyCode === 13) {
+      onSubmit(event);
+    }
+  };
+
   setBodyColor({ color: '#DDFFF7' });
+
   return (
     <div>
       <Header />
@@ -76,6 +83,7 @@ export const SignIn = () => {
               fullwidth
               onChange={handleEmail}
               value={auth.email}
+              onKeyDown={onKeyDown}
             />
             <TextInput
               label="Password"
@@ -83,6 +91,7 @@ export const SignIn = () => {
               fullwidth
               onChange={handlePassword}
               value={auth.password}
+              onKeyDown={onKeyDown}
             />
           </Grid>
         </Stack>

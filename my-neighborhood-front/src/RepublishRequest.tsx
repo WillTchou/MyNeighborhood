@@ -7,7 +7,7 @@ import {
   Switch
 } from '@mui/material';
 import { ButtonClick } from './ButtonClick';
-import { RequestGet, Status } from './models';
+import { RequestGet } from './models';
 import { useState } from 'react';
 import { requestService } from './requestService';
 
@@ -34,7 +34,12 @@ export const RepublishRequest = ({ request }: RepublishRequestType) => {
 
   const openPopin = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
-    setNewRequest({ ...newRequest, status: Status.Unfulfilled });
+    let now = new Date();
+    setNewRequest({
+      ...newRequest,
+      displayed: true,
+      creationDate: now.toJSON()
+    });
     setOpen(true);
   };
 
@@ -42,12 +47,7 @@ export const RepublishRequest = ({ request }: RepublishRequestType) => {
     <>
       <FormGroup>
         <FormControlLabel
-          control={
-            <Switch
-              checked={request.status === Status.Unfulfilled}
-              onChange={openPopin}
-            />
-          }
+          control={<Switch checked={request.displayed} onChange={openPopin} />}
           label="Republish the request"
         />
       </FormGroup>

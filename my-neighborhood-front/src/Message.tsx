@@ -1,4 +1,4 @@
-import { currentUserId } from './apiModels';
+import { authService } from './authService';
 import { ChatMessageGet } from './models';
 import { Avatar } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles/makeStyles';
@@ -13,17 +13,17 @@ export const Message = ({ chatMessage }: MessageProps) => {
   return (
     <li
       className={
-        chatMessage.sender.id === currentUserId
+        chatMessage.sender.id === authService.getUserId()
           ? classes.messageItemSender
           : classes.messageItemRecipient
       }
     >
-      {chatMessage.sender.id !== currentUserId && (
+      {chatMessage.sender.id !== authService.getUserId() && (
         <Avatar alt={chatMessage.sender.firstname} />
       )}
       <div
         className={
-          chatMessage.sender.id === currentUserId
+          chatMessage.sender.id === authService.getUserId()
             ? classes.messageDataSender
             : classes.messageDataRecipient
         }

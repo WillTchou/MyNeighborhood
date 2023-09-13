@@ -15,4 +15,5 @@ public interface RequestService {
     void deleteRequestById(String userId, UUID requestId);
     void updateRequest(UUID requestId, Request updatedRequest);
     void updateRequestWithUser(String userId, String requestId, Request updatedRequest);
+    void updateDisplayedForRequest();
 }
