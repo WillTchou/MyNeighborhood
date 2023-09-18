@@ -11,7 +11,7 @@ type ChatMessagesFlowProps = {
   message: string;
   handleMessage: (event: any) => void;
   onKeyDown: (event: any) => void;
-  send: (event: any) => Promise<void>;
+  send: (event: any) => void;
 };
 
 export const ChatMessagesFlow = ({

@@ -10,6 +10,7 @@ import setBodyColor from './setBody';
 import { authService } from './authService';
 import { ChatDrawer } from './ChatDrawer';
 import { ChatMessagesFlow } from './ChatMessagesFlow';
+import { chatMessageService } from './chatMessageService';
 
 var stompClient = null;
 
@@ -95,7 +96,7 @@ export const Chatbox = () => {
     }
   };
 
-  const sendPrivateValue = async (event) => {
+  const sendPrivateValue = (event) => {
     event.preventDefault();
     if (stompClient && message !== '') {
       var chatMessagePost: ChatMessagePost = {
@@ -124,7 +125,15 @@ export const Chatbox = () => {
 
   const onPrivateMessage = (payload) => {
     let messageData: ChatMessageGet = JSON.parse(payload.body);
-    setPrivateChats((privateChats) => [...privateChats, messageData]);
+    setTimeout(() => {
+      chatMessageService
+        .getChatFlow(messageData.sender.id)
+        .then((res) => res.data)
+        .then((result) => {
+          setPrivateChats(result);
+        })
+        .catch((err) => console.log(err));
+    }, 1000);
   };
 
   return (
