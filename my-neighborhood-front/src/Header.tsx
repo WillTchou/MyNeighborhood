@@ -62,8 +62,8 @@ export const Header = () => {
   };
 
   const logout = () => {
-    authService.logout();
     redirectSignInPage();
+    authService.logout();
   };
 
   return (
@@ -143,14 +143,20 @@ export const Header = () => {
                   </MenuList>
                 </Stack>
               ) : (
-                <MenuItem onClick={handleCloseNavMenu}>
-                  <Typography onClick={redirectSignInPage} textAlign="center">
-                    Sign In
-                  </Typography>
-                  <Typography onClick={redirectSignUpPage} textAlign="center">
-                    Sign Up
-                  </Typography>
-                </MenuItem>
+                <Stack direction="row" spacing={2}>
+                  <MenuList>
+                    <MenuItem onClick={handleCloseNavMenu}>
+                      <Typography onClick={redirectSignInPage}>
+                        Sign In
+                      </Typography>
+                    </MenuItem>
+                    <MenuItem onClick={handleCloseNavMenu}>
+                      <Typography onClick={redirectSignUpPage}>
+                        Sign Up
+                      </Typography>
+                    </MenuItem>
+                  </MenuList>
+                </Stack>
               )}
             </Menu>
           </Box>

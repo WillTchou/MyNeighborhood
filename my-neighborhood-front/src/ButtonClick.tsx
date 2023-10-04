@@ -23,6 +23,7 @@ type ButtonClickProps = {
   borderRadius?: number;
   padding?: number;
   boxShadow?: boolean;
+  fullwidth?: boolean;
 };
 
 export const ButtonClick = ({
@@ -36,7 +37,8 @@ export const ButtonClick = ({
   disabled,
   borderRadius,
   boxShadow,
-  padding
+  padding,
+  fullwidth
 }: ButtonClickProps) => {
   return (
     <Button
@@ -52,6 +54,7 @@ export const ButtonClick = ({
       size={size}
       onClick={onClick}
       disabled={disabled}
+      fullWidth={fullwidth}
     >
       {children}
     </Button>

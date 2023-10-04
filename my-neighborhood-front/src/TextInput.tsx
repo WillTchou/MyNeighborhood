@@ -1,7 +1,9 @@
 import {
   FilledInputProps,
   InputProps,
-  OutlinedInputProps
+  OutlinedInputProps,
+  SxProps,
+  Theme
 } from '@mui/material';
 import TextField, { TextFieldVariants } from '@mui/material/TextField';
 
@@ -22,6 +24,7 @@ type TextInputProps = {
     | Partial<InputProps>;
   disabled?: boolean;
   onKeyDown?: (event) => void;
+  sx?: SxProps<Theme>;
 };
 
 export const TextInput = ({
@@ -37,7 +40,8 @@ export const TextInput = ({
   value,
   InputProps,
   disabled,
-  onKeyDown
+  onKeyDown,
+  sx
 }: TextInputProps) => {
   return (
     <TextField
@@ -54,6 +58,7 @@ export const TextInput = ({
       InputProps={InputProps}
       disabled={disabled}
       onKeyDown={onKeyDown}
+      sx={sx}
     />
   );
 };

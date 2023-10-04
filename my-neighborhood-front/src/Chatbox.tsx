@@ -11,6 +11,7 @@ import { authService } from './authService';
 import { ChatDrawer } from './ChatDrawer';
 import { ChatMessagesFlow } from './ChatMessagesFlow';
 import { chatMessageService } from './chatMessageService';
+import { apiHost } from './callerService';
 
 var stompClient = null;
 
@@ -64,7 +65,7 @@ export const Chatbox = () => {
   };
 
   const connect = async () => {
-    let Sock = new SockJS('http://localhost:8080/ws');
+    let Sock = new SockJS(`${apiHost}/ws`);
     stompClient = over(Sock);
     stompClient.connect({}, onConnected, onError);
   };

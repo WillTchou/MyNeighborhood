@@ -20,6 +20,19 @@ import { useRedirectToSignInPage } from './useRedirectToSignInPage';
 import { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 import { requestService } from './requestService';
 import { GooglePlacesAutocomplete } from './GooglePlacesAutocomplete';
+import { theme } from './Theme';
+
+const styles = {
+  form: {
+    width: '600px',
+    margin: 'auto',
+    marginTop: '150px',
+    padding: '60px',
+    [theme.breakpoints.down('sm')]: {
+      width: '200px'
+    }
+  }
+};
 
 export const CreateRequest = () => {
   const classes = useStyles();
@@ -91,7 +104,7 @@ export const CreateRequest = () => {
   return (
     <div>
       <Header />
-      <Paper elevation={2} className={classes.form}>
+      <Paper elevation={2} sx={styles.form}>
         <h1 className={classes.title}>Create Request</h1>
         <Stack
           spacing={5}
@@ -157,13 +170,8 @@ export const CreateRequest = () => {
 const useStyles = makeStyles({
   title: {
     display: 'flex',
-    justifyContent: 'center'
-  },
-  form: {
-    width: '600px',
-    margin: 'auto',
-    marginTop: '150px',
-    padding: '60px'
+    justifyContent: 'center',
+    textAlign: 'center'
   },
   formContainer: {
     display: 'flex',

@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { authService } from './authService';
 
+export const apiHost = process.env.REACT_APP_API_HOST
+
 const Axios = axios.create({
-  baseURL: 'http://localhost:8080/api/v1/'
+  baseURL: `${apiHost}/api/v1/`
 });
 
 Axios.interceptors.request.use((req) => {

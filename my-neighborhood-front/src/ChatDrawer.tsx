@@ -6,13 +6,14 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { CSSObject, Theme, styled } from '@mui/material/styles';
 import { RecipientItem } from './RecipientItem';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { ChatMessageGet, User } from './models';
 import { authService } from './authService';
 import { userService } from './userService';
 import { chatMessageService } from './chatMessageService';
 import makeStyles from '@mui/styles/makeStyles/makeStyles';
 import { useNavigate } from 'react-router-dom';
+import useMediaQuery from '@mui/material/useMediaQuery/useMediaQuery';
 
 const drawerWidth = 240;
 
@@ -64,9 +65,9 @@ const Drawer = styled(MuiDrawer, {
 
 type ChatDrawerProps = {
   privateChats: ChatMessageGet[];
-  setPrivateChats: React.Dispatch<React.SetStateAction<ChatMessageGet[]>>;
-  setRecipient: React.Dispatch<React.SetStateAction<User>>;
-  setTab: React.Dispatch<React.SetStateAction<string>>;
+  setPrivateChats: Dispatch<SetStateAction<ChatMessageGet[]>>;
+  setRecipient: Dispatch<SetStateAction<User>>;
+  setTab: Dispatch<SetStateAction<string>>;
 };
 
 export const ChatDrawer = ({
@@ -76,6 +77,7 @@ export const ChatDrawer = ({
   setTab
 }: ChatDrawerProps) => {
   const classes = useStyles();
+  const matches = useMediaQuery('(min-width:600px)');
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
@@ -87,9 +89,6 @@ export const ChatDrawer = ({
       .getLatestChatMessagesForSender()
       .then((res) => res.data)
       .then((result: ChatMessageGet[]) => {
-        if (result.length === 0) {
-          navigate('/');
-        }
         setLatestMessages(result);
       });
   }, [privateChats]);
@@ -121,13 +120,15 @@ export const ChatDrawer = ({
       variant="permanent"
       open={open}
       anchor="left"
-      classes={{ paper: classes.paper }}
+      className={classes.paper}
     >
       <div className={classes.content}>
         <DrawerHeader>
-          <IconButton onClick={handleDrawer}>
-            {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </IconButton>
+          {matches && (
+            <IconButton onClick={handleDrawer}>
+              {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </IconButton>
+          )}
         </DrawerHeader>
         <Divider />
         <List>

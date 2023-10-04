@@ -9,6 +9,19 @@ import { AuthRequest } from './models';
 import { ChangeEvent, useState } from 'react';
 import { authRequestLogin } from './authRequestApi';
 import { authService } from './authService';
+import { theme } from './Theme';
+
+const styles = {
+  form: {
+    width: '600px',
+    margin: 'auto',
+    marginTop: '150px',
+    padding: '60px',
+    [theme.breakpoints.down('sm')]: {
+      width: '200px'
+    }
+  }
+};
 
 export const SignIn = () => {
   const classes = useStyles();
@@ -73,7 +86,7 @@ export const SignIn = () => {
   return (
     <div>
       <Header />
-      <Paper elevation={2} className={classes.form}>
+      <Paper elevation={2} sx={styles.form}>
         <h1 className={classes.title}>Login</h1>
         <Stack spacing={2} direction="row" className={classes.formContainer}>
           <Grid container direction="column" gap={2}>
@@ -138,12 +151,6 @@ const useStyles = makeStyles({
   title: {
     display: 'flex',
     justifyContent: 'center'
-  },
-  form: {
-    width: '600px',
-    margin: 'auto',
-    marginTop: '150px',
-    padding: '60px'
   },
   formContainer: {
     display: 'flex',

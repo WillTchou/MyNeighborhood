@@ -33,14 +33,12 @@ export const ChatMessagesFlow = ({
   };
   return (
     <Box className={classes.conversation}>
-      <ul className={classes.messageFlow}>
-        {privateChats &&
-          privateChats.map((chat, index) => (
-            <ul className={classes.messageList} ref={messagesEndRef}>
-              <Message key={index} chatMessage={chat} />
-            </ul>
-          ))}
-      </ul>
+      {privateChats &&
+        privateChats.map((chat, index) => (
+          <ul className={classes.messageList} ref={messagesEndRef}>
+            <Message key={index} chatMessage={chat} />
+          </ul>
+        ))}
       <div>
         <TextInput
           placeholder="Type your message here..."
@@ -71,19 +69,17 @@ export const ChatMessagesFlow = ({
 };
 
 const useStyles = makeStyles({
-  chatbox: {
-    display: 'flex'
-  },
   conversation: {
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
-    margin: '80px',
     padding: '22px',
-    height: '700px',
     zIndex: '80 !important',
     backgroundColor: 'white',
-    overflowY: 'scroll'
+    overflowY: 'scroll',
+    borderLeft: '1px solid #FADADD',
+    height: '100vh',
+    marginTop: '55px'
   },
   messageFlow: {
     flexGrow: 1,

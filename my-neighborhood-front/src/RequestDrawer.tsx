@@ -14,10 +14,12 @@ import { useEffect, useState } from 'react';
 import { FulFillRequestPopin } from './FulFillRequestPopin';
 import { over } from 'stompjs';
 import SockJS from 'sockjs-client';
-import { currentUserId, headers } from './apiModels';
+import { headers } from './apiModels';
 import { volunteerService } from './volunteerService';
 import { useNavigate } from 'react-router-dom';
 import { userService } from './userService';
+import { apiHost } from './callerService';
+import { authService } from './authService';
 
 let initialValue = {
   id: '',
@@ -51,16 +53,16 @@ export const RequestDrawer = ({
 
   useEffect(() => {
     userService
-      .getUserById(currentUserId)
+      .getUserById(authService.getUserId())
       .then((res) => res.data)
       .then((result) => setUser(result));
   }, []);
 
   const configureSocket = async () => {
-    let Sock = new SockJS('http://localhost:8080/ws');
+    let Sock = new SockJS(`${apiHost}/ws`);
     stompClient = over(Sock);
     stompClient.connect({}, () =>
-      stompClient.subscribe('/user/' + currentUserId + '/private', {})
+      stompClient.subscribe('/user/' + authService.getUserId() + '/private', {})
     );
   };
 
@@ -73,10 +75,31 @@ export const RequestDrawer = ({
     navigate('/chatbox');
   };
 
-  const helpRequest = (requestId: string) => {
+  const sendMessage = (message: string) => {
+    var chatMessage: ChatMessagePost = {
+      sender: user,
+      recipient: request.requester,
+      content: message,
+      messageType: MessageType.CHAT,
+      flow:
+        user.id < request.requester.id
+          ? user.id + '/' + request.requester.id
+          : request.requester.id + '/' + user.id
+    };
+    stompClient.send(
+      '/myNeighborhood/private-message',
+      headers,
+      JSON.stringify(chatMessage)
+    );
+  };
+
+  const helpRequest = (requestId: string, message: string) => {
     volunteerService
       .createVolunteer(requestId)
-      .then(() => redirectChatboxPage())
+      .then(() => {
+        redirectChatboxPage();
+        sendMessage(message);
+      })
       .catch((err) => {
         setError(err.response.data.code);
         setTimeout(() => {
@@ -92,22 +115,7 @@ export const RequestDrawer = ({
   ) => {
     event.preventDefault();
     if (stompClient) {
-      helpRequest(request.id);
-      var chatMessage: ChatMessagePost = {
-        sender: user,
-        recipient: request.requester,
-        content: message,
-        messageType: MessageType.CHAT,
-        flow:
-          user.id < request.requester.id
-            ? user.id + '/' + request.requester.id
-            : request.requester.id + '/' + user.id
-      };
-      stompClient.send(
-        '/myNeighborhood/private-message',
-        headers,
-        JSON.stringify(chatMessage)
-      );
+      helpRequest(request.id, message);
     }
   };
 
@@ -144,8 +152,10 @@ export const RequestDrawer = ({
           <Label children={TypeEnum[request.type]} />
           <Label children={Status[request.status]} />
         </Stack>
-        <span className={classes.address}>{request.address}</span>
-        <p className={classes.description}>{request.description}</p>
+        <Stack spacing={2} direction="column" className={classes.part}>
+          <span className={classes.address}>{request.address}</span>
+          <p className={classes.description}>{request.description}</p>
+        </Stack>
         <div className={classes.fulfill}>
           <ButtonClick
             backgroundColor="#FFA69E"
@@ -176,6 +186,9 @@ const useStyles = makeStyles({
   paper: {
     width: 300,
     zIndex: '80 !important'
+  },
+  part: {
+    marginTop: '22px'
   },
   address: {
     display: 'flex',

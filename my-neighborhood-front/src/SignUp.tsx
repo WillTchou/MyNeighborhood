@@ -1,4 +1,4 @@
-import { Paper, Stack } from '@mui/material';
+import { Paper, Stack, useMediaQuery } from '@mui/material';
 import { Header } from './Header';
 import { InputFile } from './InputFile';
 import { makeStyles } from '@mui/styles';
@@ -11,9 +11,24 @@ import { authRequestRegister } from './authRequestApi';
 import { useNavigate } from 'react-router-dom';
 import { authService } from './authService';
 import axios from 'axios';
+import { apiHost } from './callerService';
+import { theme } from './Theme';
+
+const styles = {
+  form: {
+    width: '600px',
+    margin: 'auto',
+    marginTop: '150px',
+    padding: '60px',
+    [theme.breakpoints.down('sm')]: {
+      width: '200px'
+    }
+  }
+};
 
 export const SignUp = () => {
   const classes = useStyles();
+  const matches = useMediaQuery('(min-width:600px)');
   const navigate = useNavigate();
 
   setBodyColor({ color: '#DDFFF7' });
@@ -94,7 +109,7 @@ export const SignUp = () => {
     var data = new FormData();
     data.append('document', governmentIdentity);
     axios
-      .post('http://localhost:8080/api/v1/governmentIdentity', data)
+      .post(`${apiHost}/api/v1/governmentIdentity`, data)
       .then((res) => setUser({ ...user, governmentIdentityId: res.data }))
       .catch((err) => {
         setErrorGov(err.message);
@@ -107,9 +122,13 @@ export const SignUp = () => {
   return (
     <div>
       <Header />
-      <Paper elevation={2} className={classes.form}>
+      <Paper elevation={2} sx={styles.form}>
         <h1 className={classes.title}>Registration form</h1>
-        <Stack spacing={2} direction="row" className={classes.formContainer}>
+        <Stack
+          spacing={2}
+          direction={matches ? 'row' : 'column'}
+          className={classes.formContainer}
+        >
           <Stack spacing={2} direction="column">
             <TextInput
               label="Firstname"
@@ -192,12 +211,6 @@ const useStyles = makeStyles({
   title: {
     display: 'flex',
     justifyContent: 'center'
-  },
-  form: {
-    width: '600px',
-    margin: 'auto',
-    marginTop: '150px',
-    padding: '60px'
   },
   formContainer: {
     display: 'flex',

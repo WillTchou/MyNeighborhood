@@ -1,6 +1,7 @@
+import { apiHost } from './callerService';
 import axios from 'axios';
 
-let url: 'http://localhost:8080/api/v1/governmentIdentity';
+let url= `${apiHost}/api/v1/governmentIdentity`;
 let headers = {
   headers: { 'Content-Type': 'multipart/form-data' }
 };
