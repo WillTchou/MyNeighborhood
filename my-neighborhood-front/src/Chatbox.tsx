@@ -11,9 +11,6 @@ import { authService } from './authService';
 import { ChatDrawer } from './ChatDrawer';
 import { ChatMessagesFlow } from './ChatMessagesFlow';
 import { chatMessageService } from './chatMessageService';
-import { apiHost } from './callerService';
-
-var stompClient = null;
 
 let initialValueSender = {
   id: authService.getUserId(),
@@ -48,32 +45,44 @@ export const Chatbox = () => {
   const [recipient, setRecipient] = useState<User>(initialValueRecipient);
   const [tab, setTab] = useState('');
   const [message, setMessage] = useState('');
-
-  const onConnected = () => {
-    setTimeout(
-      () =>
-        stompClient.subscribe(
-          '/user/' + authService.getUserId() + '/private',
-          onPrivateMessage
-        ),
-      800
-    );
-  };
+  const [isConnected, setIsConnected] = useState(false);
+  const [stompClient, setStompClient] = useState(null);
 
   const onError = (error) => {
-    console.log(error);
-  };
-
-  const connect = async () => {
-    let Sock = new SockJS(`${apiHost}/ws`);
-    stompClient = over(Sock);
-    stompClient.connect({}, onConnected, onError);
+    console.error(error);
   };
 
   useEffect(() => {
-    connect();
-    return () => console.log('disconnect');
+    let Sock = new SockJS(`https://my-neighborhood-app.com/ws`);
+    const client = over(Sock);
+    client.connect(
+      {},
+      () => {
+        setIsConnected(true);
+      },
+      onError
+    );
+
+    setStompClient(client);
+
+    return () => {
+      if (stompClient) {
+        stompClient.disconnect();
+      }
+    };
   }, []);
+
+  useEffect(() => {
+    if (isConnected) {
+      const subscription = stompClient.subscribe(
+        '/user/' + authService.getUserId() + '/private',
+        onPrivateMessage
+      );
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [isConnected]);
 
   useEffect(() => {
     userService
@@ -99,7 +108,7 @@ export const Chatbox = () => {
 
   const sendPrivateValue = (event) => {
     event.preventDefault();
-    if (stompClient && message !== '') {
+    if (!!stompClient && message !== '' && isConnected) {
       var chatMessagePost: ChatMessagePost = {
         sender: sender,
         recipient: recipient,
@@ -121,20 +130,26 @@ export const Chatbox = () => {
       };
       emptyMessage();
       setPrivateChats([...privateChats, chatMessageGet]);
+    } else {
+      setTimeout(() => sendPrivateValue(event), 300);
     }
   };
 
   const onPrivateMessage = (payload) => {
-    let messageData: ChatMessageGet = JSON.parse(payload.body);
-    setTimeout(() => {
-      chatMessageService
-        .getChatFlow(messageData.sender.id)
-        .then((res) => res.data)
-        .then((result) => {
-          setPrivateChats(result);
-        })
-        .catch((err) => console.log(err));
-    }, 1000);
+    if (isConnected) {
+      let messageData: ChatMessageGet = JSON.parse(payload.body);
+      setTimeout(() => {
+        chatMessageService
+          .getChatFlow(messageData.sender.id)
+          .then((res) => res.data)
+          .then((result) => {
+            setPrivateChats(result);
+          })
+          .catch((err) => console.log(err));
+      }, 1000);
+    } else {
+      setTimeout(() => onPrivateMessage(payload), 300);
+    }
   };
 
   return (

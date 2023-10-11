@@ -1,5 +1,5 @@
 import { GoogleMap } from '@react-google-maps/api';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { requestService } from './requestService';
 import { RequestGet } from './models';
 import { RequestMarker } from './RequestMarker';
@@ -15,14 +15,14 @@ export const Map = () => {
 
   const classes = useStyles();
 
-  const getUnfulfilledRequest = () => {
+  const getUnfulfilledRequest = useCallback(() => {
     requestService
       .getRequestsNumber()
       .then((res) => res.data)
       .then((result) => {
         setUnfulfilledNumber(result);
       });
-  };
+  }, []);
 
   useEffect(() => {
     getUnfulfilledRequest();
@@ -30,7 +30,7 @@ export const Map = () => {
       getUnfulfilledRequest();
     }, MINUTE_MS);
     return () => clearInterval(interval);
-  }, [requestService]);
+  }, [getUnfulfilledRequest]);
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {

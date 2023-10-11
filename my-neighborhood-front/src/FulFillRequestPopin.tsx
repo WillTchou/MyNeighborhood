@@ -17,6 +17,7 @@ type FulFillRequestPopinProps = {
   request: RequestGet;
   onSend: (event: any, request: RequestGet, message: string) => void;
   error: string;
+  stompClient: any;
 };
 
 export const FulFillRequestPopin = ({
@@ -24,7 +25,8 @@ export const FulFillRequestPopin = ({
   setOpen,
   request,
   onSend,
-  error
+  error,
+  stompClient
 }: FulFillRequestPopinProps) => {
   const [message, setMessage] = useState('');
   const [openMessage, setOpenMessage] = useState(true);
@@ -46,6 +48,7 @@ export const FulFillRequestPopin = ({
 
   const handleClose = () => {
     setOpen(false);
+    stompClient.disconnect();
     disableMessage();
   };
 

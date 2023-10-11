@@ -18,7 +18,6 @@ import { headers } from './apiModels';
 import { volunteerService } from './volunteerService';
 import { useNavigate } from 'react-router-dom';
 import { userService } from './userService';
-import { apiHost } from './callerService';
 import { authService } from './authService';
 
 let initialValue = {
@@ -31,7 +30,6 @@ let initialValue = {
   governmentIdentityId: '',
   profilePictureId: ''
 };
-var stompClient = null;
 
 type RequestDrawerProps = {
   open: boolean;
@@ -47,6 +45,8 @@ export const RequestDrawer = ({
   const [openPopin, setOpenPopin] = useState(false);
   const [user, setUser] = useState<User>(initialValue);
   const [error, setError] = useState('');
+  const [isConnected, setIsConnected] = useState(false);
+  const [stompClient, setStompClient] = useState(null);
 
   const classes = useStyles();
   const navigate = useNavigate();
@@ -59,12 +59,26 @@ export const RequestDrawer = ({
   }, []);
 
   const configureSocket = async () => {
-    let Sock = new SockJS(`${apiHost}/ws`);
-    stompClient = over(Sock);
-    stompClient.connect({}, () =>
-      stompClient.subscribe('/user/' + authService.getUserId() + '/private', {})
-    );
+    let Sock = new SockJS(`https://my-neighborhood-app.com/ws`);
+    const client = over(Sock);
+    client.connect({}, () => {
+      client.subscribe('/user/' + authService.getUserId() + '/private', {});
+      setIsConnected(true);
+    });
+    setStompClient(client);
   };
+
+  useEffect(() => {
+    if (isConnected) {
+      const subscription = stompClient.subscribe(
+        '/user/' + authService.getUserId() + '/private',
+        {}
+      );
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [isConnected]);
 
   const handleClickOpen = () => {
     configureSocket();
@@ -76,21 +90,25 @@ export const RequestDrawer = ({
   };
 
   const sendMessage = (message: string) => {
-    var chatMessage: ChatMessagePost = {
-      sender: user,
-      recipient: request.requester,
-      content: message,
-      messageType: MessageType.CHAT,
-      flow:
-        user.id < request.requester.id
-          ? user.id + '/' + request.requester.id
-          : request.requester.id + '/' + user.id
-    };
-    stompClient.send(
-      '/myNeighborhood/private-message',
-      headers,
-      JSON.stringify(chatMessage)
-    );
+    if (!!stompClient && isConnected) {
+      var chatMessage: ChatMessagePost = {
+        sender: user,
+        recipient: request.requester,
+        content: message,
+        messageType: MessageType.CHAT,
+        flow:
+          user.id < request.requester.id
+            ? user.id + '/' + request.requester.id
+            : request.requester.id + '/' + user.id
+      };
+      stompClient.send(
+        '/myNeighborhood/private-message',
+        headers,
+        JSON.stringify(chatMessage)
+      );
+    } else {
+      setTimeout(() => sendMessage(message), 300);
+    }
   };
 
   const helpRequest = (requestId: string, message: string) => {
@@ -174,6 +192,7 @@ export const RequestDrawer = ({
               request={request}
               onSend={sendPrivateValue}
               error={error}
+              stompClient={stompClient}
             />
           )}
         </div>

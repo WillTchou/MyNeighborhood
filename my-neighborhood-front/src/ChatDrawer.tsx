@@ -12,7 +12,6 @@ import { authService } from './authService';
 import { userService } from './userService';
 import { chatMessageService } from './chatMessageService';
 import makeStyles from '@mui/styles/makeStyles/makeStyles';
-import { useNavigate } from 'react-router-dom';
 import useMediaQuery from '@mui/material/useMediaQuery/useMediaQuery';
 
 const drawerWidth = 240;
@@ -78,7 +77,6 @@ export const ChatDrawer = ({
 }: ChatDrawerProps) => {
   const classes = useStyles();
   const matches = useMediaQuery('(min-width:600px)');
-  const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
